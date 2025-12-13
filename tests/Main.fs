@@ -1,4 +1,4 @@
-﻿module ProteomIQon.Tests
+﻿module QualIQon.Tests
 open Expecto
 
 [<EntryPoint>]

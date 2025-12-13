@@ -1,4 +1,4 @@
-namespace QualIQon 
+namespace QualIQon
 
 open System
 open ProteomIQon
@@ -7,14 +7,12 @@ open MzIO.IO.MzML
 open MzIO.Processing
 open MzIO.Model
 
-module MS1Map = 
-        
-        
+module MS1Map =    
     type pieces = {
     RetentionTime:  float;
     mz:             float; 
-    intensity:      float 
-}
+    intensity:      float  
+    }
 
 
     let customCulture: Globalization.CultureInfo = 

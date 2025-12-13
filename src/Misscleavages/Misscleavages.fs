@@ -10,17 +10,28 @@ open Plotly.NET.LayoutObjects
 open Deedle
 
     module Misscleavages = 
+            // Miscleavages
+            type Parameters = 
+                {
+                    MC : int
+                }
+        //just needed for unit test 
+        let relativeDistribution (data: Parameters[]) =
+            data
+            |> Array.map (fun x -> x.MC)
+            |> Array.countBy id
+            |> Array.sortBy fst
+            |> fun grouped ->
+                let sum = grouped |> Array.sumBy snd |> float
+                grouped |> Array.map (fun (mc,c) -> mc, float c / sum)
+        
+        //main Code is starting here
         let misscleavages = 
             let customCulture: Globalization.CultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture.Clone() :?> Globalization.CultureInfo
             customCulture.NumberFormat.NumberDecimalSeparator <- "."
             System.Threading.Thread.CurrentThread.CurrentCulture <- customCulture
 
-            // Miscleavages 
-            type Parameters = 
-                {
-                    MC : int
-                }
-
+             
             let layout = 
                 let axsisLayout () =
                     LinearAxis.init (
