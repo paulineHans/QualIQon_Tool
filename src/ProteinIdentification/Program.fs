@@ -1,15 +1,17 @@
 namespace QualIQon
 
-open Plotly.NET.TraceObjects
-open Plotly.NET.LayoutObjects
-open ProteomIQon.Dto
-open Plotly.NET
-open System
-open BioFSharp
-open BioFSharp.IO
-open BioFSharp.PeptideClassification
+// open Plotly.NET.TraceObjects
+// open Plotly.NET.LayoutObjects
+// open ProteomIQon.Dto
+// open Plotly.NET
+// open System
+// open BioFSharp
+// open BioFSharp.IO
+// open BioFSharp.PeptideClassification
+
 open Argu
-open CLIArgumentParsing
+open CLIArguments
+open System.Reflection
 
 module consule_ProteinIdentification = 
         [<EntryPoint>]

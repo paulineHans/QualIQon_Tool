@@ -19,10 +19,10 @@
     <Description>QualIQon.Correlation_Light_Heavy - Quality Control for computational proteomics</Description>
     <Summary>QualIQon.Correlation_Light_Heavy - Quality Control for computational proteomics</Summary>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://csbiology.github.io/ProteomIQon/</PackageProjectUrl>
-    <!--<PackageIconUrl>https://github.com/CSBiology/ProteomIQon</PackageIconUrl>-->
+    <PackageProjectUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageProjectUrl>
+    <!--<PackageIconUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageIconUrl>-->
     <PackageTags>fsharp dotnet proteomics</PackageTags>
-    <RepositoryUrl>https://github.com/CSBiology/ProteomIQon</RepositoryUrl>
+    <RepositoryUrl>https://github.com/paulineHans/QualIQon_Tool.git/RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <FsDocsLicenseLink>https://github.com/CSBiology/ProteomIQon/blob/master/LICENSE</FsDocsLicenseLink>
     <FsDocsReleaseNotesLink>https://github.com/CSBiology/ProteomIQon/blob/master/RELEASE_NOTES.md</FsDocsReleaseNotesLink>
