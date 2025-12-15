@@ -417,7 +417,7 @@ module Misscleavages =
         | "MaxQuant" -> "evidence.txt"
         | _ -> failwith "no file found"
 
-    let finalHeatmapQuantHeavy (directoryName: string) pipeline =
+    let mcExe (directoryName: string) pipeline =
             let searchpattern = getFiles pipeline
             let allData = searchFiles  directoryName searchpattern
             Array.map (pipelineUsed pipeline) allData
@@ -653,27 +653,36 @@ module ScoreRefinement =
 
 //MS1Map, TIC, XIC
 module MassspecFiles = 
-     let files (directorypath: string) =
-        let allData  = System.IO.Directory.GetFiles (directorypath, "*.mzML")
-        let exe = 
-            allData
-            |> Array.map (fun x -> 
-            let inReaderMS = new MzMLReader(x)
-            let inReaderPeaks = new MzMLReader(x)
-            let inRunID  = Core.MzIO.Reader.getDefaultRunID inReaderMS 
-            let allSpectra = inReaderMS.ReadMassSpectra inRunID
-            let getMassSpecData  = 
-                allSpectra
-                |> Seq.choose (fun ms ->
-                    match MzIO.Processing.MassSpectrum.getMsLevel ms with
-                    | 1 -> 
-                        Some(
-                            MzIO.Processing.MassSpectrum.getScanTime ms,
-                            PeakArray.mzIntensityArrayOf
-                                ((inReaderPeaks).getSpecificPeak1DArraySequential ms.ID)
+       let filesToMassSpectrum (directoryPath: string) =
+            let allData  = System.IO.Directory.GetFiles (directoryPath, "*.mzML")
+            let exe = 
+                allData
+                |> Array.map (fun x -> 
+                    let inReaderMS = new MzMLReader(x)
+                    let inReaderPeaks = new MzMLReader(x)
+                    let inRunID  = Core.MzIO.Reader.getDefaultRunID inReaderMS 
+                    let allSpectra = inReaderMS.ReadMassSpectra inRunID
+                    
+                    let getMassSpecData (x : Collections.Generic.IEnumerable<MassSpectrum>) = 
+                        x
+                        |> Seq.choose (fun ms ->
+                            match MzIO.Processing.MassSpectrum.getMsLevel ms with
+                            | 1 -> 
+                                Some(
+                                    MzIO.Processing.MassSpectrum.getScanTime ms,
+                                    PeakArray.mzIntensityArrayOf
+                                        (inReaderPeaks.getSpecificPeak1DArraySequential ms.ID)
+                                )
+                            | _ -> None
                         )
-                    | _ -> None
+                        |> Seq.toArray 
+                        |> Array.map (fun (rt,(xs, ys))-> 
+                            Array.zip xs ys
+                            |> Array.map (fun (x,y)-> rt, (x,y))
+                        )
+
+                    let massSpecData = allSpectra |> getMassSpecData
+                    massSpecData
                 )
-            getMassSpecData)
-        exe
+            exe
 

@@ -332,3 +332,213 @@ module CorrelationLightHeavyPlot =
                                 |> Chart.withSize (2200,1700)
                     fining
                 stylingChart
+
+module MisscleavagesPlot = 
+    open Misscleavages
+        let MC (dirName: string) (pipeline: string) = 
+            let inputData = Misscleavages.mcExe dirName pipeline
+            let exe = 
+                inputData
+                |> Array.fold (fun (c : float, acc : list<GenericChart*string>) (x:(string*(ParametersMisscleavages array))) ->  
+                        let file = (fst x ).Split("TM").[1]
+                        let data = snd x            
+                        let groupMC =             
+                            data
+                            |> Array.map (fun x -> x.MC)
+                            |> Array.countBy id 
+                            |> Array.sortBy fst
+                        let sumAllMC = 
+                            groupMC |> Array.sumBy snd |> float
+                        let getPerMC = 
+                            groupMC |> Array.map (fun (key,count) -> 
+                            string key, (((count |> float) /sumAllMC)))
+                            |> Array.tail 
+                        let maxN = 
+                            getPerMC
+                            |> Array.maxBy snd 
+                            |> snd 
+                        let newMax = 
+                            if maxN > c then maxN
+                            else c
+                        let chart = 
+                            Chart.Column (
+                                keysValues = getPerMC,
+                                MarkerColor = Color.fromColors [Color.fromHex("#FFA252"); Color.fromHex("#E31B4C")]
+                                ) 
+                            |> Chart.withTraceInfo (ShowLegend = false)
+                        (newMax, (chart,file) :: acc) 
+                    )
+
+                        (0,[])
+            let layout = 
+                let axsisLayout () =
+                    LinearAxis.init (
+                        ShowLine = true,
+                        ZeroLine = false,
+                        TickLabelStep = 1,
+                        ShowTickLabels = true,
+                        Mirror = StyleParam.Mirror.All,
+                        TickFont = (Font.init (Size = 20))    
+                    )
+                
+                let majorLayout =    
+                        Layout.init (
+                            Title.init(
+                                    Text="<b>Overview of the realtive distribution of Misscleavages in <i>Chlamydomonas reinhardtii<i><b>", 
+                                    Font = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 30, Color = Color.fromString "Black")), 
+                                    XAnchor = StyleParam.XAnchorPosition.Center,
+                                    AutoMargin = false,
+                                    Standoff = 2
+                                ),
+                            Font = Font.init (Family = StyleParam.FontFamily.Arial, Size = 20, Color = Color.fromString "Black")
+                            )
+                        |> Layout.setLinearAxis ((StyleParam.SubPlotId.XAxis 1), (axsisLayout ()))
+                        |> Layout.setLinearAxis ((StyleParam.SubPlotId.YAxis 1), (axsisLayout ()))
+
+                let traceLayout = 
+                        [Trace2D.initScatter(
+                            Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
+                    
+                let templateChlamy = Template.init (majorLayout, traceLayout)
+                templateChlamy
+            //miscleavagesHistogram
+            let maxY,chartListRaw = exe 
+            let chartList,titlList =List.unzip chartListRaw
+            let chartListMaxY = 
+                chartList
+                |> List.map (fun x  -> 
+                    x
+                    |> Chart.withTemplate layout
+                    |> Chart.withYAxisStyle(TitleText = "<b>relative distribution of Misscleavages <b>", MinMax = (0,(maxY *1.1)), TitleStandoff = 5 )
+                    |> Chart.withXAxisStyle(TitleText = "<b>Amount of Misscleavages<b>", MinMax = (0,3), TitleStandoff = 5)
+
+                    )  
+                    
+            let gridCombination = 
+                let nRows = 
+                    System.Math.Ceiling((chartListMaxY.Length |> float) / 4.)
+                chartListMaxY
+                |> Chart.Grid ((nRows |> int),6, Pattern = StyleParam.LayoutGridPattern.Coupled, XGap = 0.2, YGap = 0.3)
+
+            let stylingChart = 
+                gridCombination
+                |> Chart.withSize (2200,2200)
+                |> Chart.withMarginSize(300,250,130,180)
+            stylingChart
+
+module MS1MapPlot = 
+    open MassspecFiles 
+        let inputData (dirName: string) = MassspecFiles.filesToMassSpectrum dirName
+        let calc (path:string) = 
+            let input  = inputData path
+            let create bandwidth (data: pieces[]) =            
+                let halfBw = bandwidth / 1.0       
+                data
+                |> Seq.groupBy (fun x -> floor (x.RetentionTime / bandwidth)) 
+                |> Seq.map (fun (k,values) ->                                 
+                    if k < 0. then
+                        ((k  * bandwidth) + halfBw, values)   
+                    else
+                        ((k + 1.) * bandwidth) - halfBw, values)  
+                |> Map.ofSeq
+
+            //bins for inner m/Z values
+            let findMzBins (minMax: float * float) = 
+                let min,max = minMax
+                abs(ceil max - floor min) / 50.
+
+            //collect all m/z -> Min & Max for Binning 
+            let minMaxAllSpectra  =
+                let outerArray = 
+                    input
+                    |> Array.map (fun outer -> 
+                        let data = 
+                            outer
+                            |> Array.map (fun x -> 
+                                x
+                                |> Array.map (fun (x,y)->  
+                                    y
+                                    |> fst
+                                )
+                            )
+                        let min = 
+                            data 
+                            |> Array.map(fun x -> 
+                                x
+                                |> Array.min)
+                            |> Array.min
+                            
+                        let max = 
+                            data 
+                            |> Array.map(fun x -> 
+                                x
+                                |> Array.max)
+                            |> Array.max
+                        min, max )
+                outerArray
+            let concatMzBins = minMaxAllSpectra |> Array.map (findMzBins)
+
+            let createMzBins bandwidth (data: pieces[]) =            
+                let halfBw = bandwidth / 1.0       
+                data
+                |> Seq.groupBy (fun x -> floor (x.mz / bandwidth)) 
+                |> Seq.map (fun (k,values) ->                                 
+                    if k < 0. then
+                        ((k  * bandwidth) + halfBw, values)   
+                    else
+                        ((k + 1.) * bandwidth) - halfBw, values)  
+                |> Map.ofSeq
+
+            let dataXIC  = 
+                let accsessParameters = 
+                    input 
+                    |> Array.map (fun z -> 
+                        z                        |> Array.collect (fun x -> 
+                            x
+                            |> Array.map (fun (y ,(z,a))-> 
+                                {RetentionTime = y;
+                                mz = z;
+                                intensity = a})))
+                //anwendung der binning funktionen
+                let binRT = 
+                    accsessParameters
+                    |> Array.map (fun x ->
+                        x
+                        |> create 1
+                        |> Map.toArray)
+                let binMz = 
+                    binRT 
+                    |> Array.map(fun z -> 
+                            z
+                            |> Array.map (fun (x,y) -> 
+                                let muhaha = 
+                                    y
+                                    |> Seq.toArray
+                                    |> createMzBins concatMzBins  
+                                    |> Map.toArray
+                                    |> Array.map (fun (x,y)-> 
+                                        //Berechnung der SUmme der Intensitäten pro m/Z bin 
+                                        let calcSumIntensity = 
+                                            y
+                                            |> Seq.toArray
+                                            |> Array.map (fun x -> x.intensity)
+                                            |> Array.sum
+                                        x, calcSumIntensity)
+                                x, muhaha
+                        )
+                    )
+                binMz
+
+            let Heatmap = 
+                let extractIntensity = 
+                    dataXIC
+                    |> Array.map (fun x -> 
+                        x
+                        |> fun (x,y)-> 
+                            y
+                            |> Array.map (fun x -> snd x))  
+                let chart = 
+                    Chart.Heatmap (zData = extractIntensity)
+                chart 
+        
+
