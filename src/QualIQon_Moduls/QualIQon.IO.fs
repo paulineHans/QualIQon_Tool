@@ -292,7 +292,7 @@ module CorrRatio =
         | "ProteomIQon" -> "*.quant"
         | _ -> "unknown Format"
 
-    let finalHeatmapQuantHeavy (directoryName: string) pipeline =
+    let finalHeatmapQuantRatio (directoryName: string) pipeline =
             let searchpattern = getFiles pipeline
             let allData = searchFiles  directoryName searchpattern
             Array.map (pipelineUsed pipeline) allData
