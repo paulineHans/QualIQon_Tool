@@ -192,7 +192,7 @@ open System
                     ) getFiles 
                 createChart
             bandWidthCalculation
-        histogram
+        
 
         //adapter function 
         let proteomIQonToParams (path: string) = 

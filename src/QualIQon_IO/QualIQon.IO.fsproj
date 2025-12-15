@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
@@ -19,18 +19,15 @@
     <Description>QualIQon.IO - Quality Control for computational proteomics</Description>
     <Summary>QualIQon.IO - Quality Control for computational proteomics</Summary>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://csbiology.github.io/ProteomIQon/</PackageProjectUrl>
-    <!--<PackageIconUrl>https://github.com/CSBiology/ProteomIQon</PackageIconUrl>-->
+    <PackageProjectUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageProjectUrl>
+    <!--<PackageIconUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageIconUrl>-->
     <PackageTags>fsharp dotnet proteomics</PackageTags>
-    <RepositoryUrl>https://github.com/CSBiology/ProteomIQon</RepositoryUrl>
+    <RepositoryUrl>https://github.com/paulineHans/QualIQon_Tool.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <FsDocsLicenseLink>https://github.com/CSBiology/ProteomIQon/blob/master/LICENSE</FsDocsLicenseLink>
-    <FsDocsReleaseNotesLink>https://github.com/CSBiology/ProteomIQon/blob/master/RELEASE_NOTES.md</FsDocsReleaseNotesLink>
+
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CorrHeavyFiles.fs" />
-    <Compile Include="CLIArguments.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="QualIQon.IO.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharpAux" />
