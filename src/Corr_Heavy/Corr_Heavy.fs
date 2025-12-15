@@ -9,7 +9,7 @@ open FSharpAux
 open Plotly.NET.TraceObjects
 open Plotly.NET.LayoutObjects
 
-module Corr_Heavy =     
+module CorrHeavy =     
     
     let customCulture: Globalization.CultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture.Clone() :?> Globalization.CultureInfo
     customCulture.NumberFormat.NumberDecimalSeparator <- "."
