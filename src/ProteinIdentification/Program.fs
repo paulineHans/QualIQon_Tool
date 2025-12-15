@@ -10,7 +10,7 @@ namespace QualIQon
 // open BioFSharp.PeptideClassification
 
 open Argu
-open CLIArguments
+open CLI_Parsing
 open System.Reflection
 
 module consule_ProteinIdentification = 

@@ -1,12 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>qualIQon-Corr-Heavy</ToolCommandName>
-    <RootNamespace>Corr-Heavy</RootNamespace>
-    <AssemblyName>QualIQon.Corr-Heavy</AssemblyName>
-    <Name>QualIQon.Corr-Heavy</Name>
+    <ToolCommandName>QualIQon.IO</ToolCommandName>
+    <RootNamespace>QualIQon.IO</RootNamespace>
+    <AssemblyName>QualIQon.IO</AssemblyName>
+    <Name>QualIQon.IO</Name>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -16,8 +16,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <Authors>Pauline Hans</Authors>
-    <Description>QualIQon.Corr-Heavy - Quality Control for computational proteomics</Description>
-    <Summary>QualIQon.Corr-Heavy - Quality Control for computational proteomics</Summary>
+    <Description>QualIQon.IO - Quality Control for computational proteomics</Description>
+    <Summary>QualIQon.IO - Quality Control for computational proteomics</Summary>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://csbiology.github.io/ProteomIQon/</PackageProjectUrl>
     <!--<PackageIconUrl>https://github.com/CSBiology/ProteomIQon</PackageIconUrl>-->
@@ -28,9 +28,9 @@
     <FsDocsReleaseNotesLink>https://github.com/CSBiology/ProteomIQon/blob/master/RELEASE_NOTES.md</FsDocsReleaseNotesLink>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Corr_Heavy.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="CorrHeavyFiles.fs" />
     <Compile Include="CLIArguments.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharpAux" />

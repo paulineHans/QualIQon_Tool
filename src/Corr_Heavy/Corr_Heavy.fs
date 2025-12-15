@@ -118,7 +118,7 @@ module Corr_Heavy =
         // Recursively search each subdirectory.
         let subDirFiles =
             subDirectories
-            |> Array.collect (fun subDir -> searchFiles subDir fileName)
+            |> Array.collect (fun subDir -> searchFilesQH subDir fileName)
         
         // Combine files from the current directory and all subdirectories.
         Array.append currentFiles subDirFiles
