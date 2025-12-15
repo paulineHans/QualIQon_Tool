@@ -8,13 +8,13 @@ open Plotly.NET
 open Plotly.NET.TraceObjects
 open Plotly.NET.LayoutObjects
 open Deedle
+type Parameters = 
+    {
+        MC : int
+    }
 
-    module Misscleavages = 
-            // Miscleavages
-            type Parameters = 
-                {
-                    MC : int
-                }
+module Misscleavages = 
+        // Miscleavages
         //just needed for unit test 
         let relativeDistribution (data: Parameters[]) =
             data

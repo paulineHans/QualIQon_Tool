@@ -8,6 +8,8 @@ open System
 open BioFSharp
 open BioFSharp.IO
 open BioFSharp.PeptideClassification
+open Argu
+open CLIArgumentParsing
 
 module consule_ProteinIdentification = 
         [<EntryPoint>]
@@ -17,10 +19,10 @@ module consule_ProteinIdentification =
                 let results = parser.Parse argv
                 let i = results.GetResult directoryPath 
                 let o = results.GetResult pipeline 
-                let p = results.GetResult FASTA       
+                let f = results.GetResult FASTA       
                 let execution = 
                     let dir = System.IO.Directory.CreateDirectory ((String.concat "" [| "./arc/runs" ;i;"/Results/ProteinIdentification" |]))
-                    let exe = ProteinIdentification.finalChartHisto i o p
+                    let exe = ProteinIdentification.finalChartHisto i o f
                     exe 
                 execution
                 0

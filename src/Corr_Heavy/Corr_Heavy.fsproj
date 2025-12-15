@@ -33,9 +33,6 @@
     <Compile Include="CLIArguments.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../tests/QualIQon.Tests.fsproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="FSharpAux" />
     <PackageReference Include="FSharpAux.IO" />
     <PackageReference Include="FSharp.Stats.Interactive" />

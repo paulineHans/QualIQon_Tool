@@ -14,7 +14,7 @@ module CLI_Parsing =
     type CLIArguments =
         | [<AltCommandLine("-i")>] DirectoryPath of path:string 
         | [<AltCommandLine("-o")>] Pipeline  of path:string 
-        | [<AltCommandLine("-p")>] FASTA  of path:string 
+        | [<AltCommandLine("-f")>] FASTA  of path:string 
 
     with
         interface IArgParserTemplate with
