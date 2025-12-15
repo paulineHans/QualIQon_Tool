@@ -235,7 +235,7 @@ module CorrLight =
         | "ProteomIQon" -> "*.quant"
         | _ -> "unknown Format"
 
-    let finalHeatmapQuantHeavy (directoryName: string) pipeline =
+    let finalHeatmapQuantLight (directoryName: string) pipeline =
             let searchpattern = getFiles pipeline
             let allData = searchFiles  directoryName searchpattern
             Array.map (pipelineUsed pipeline) allData

@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
-    <RootNamespace>QualIQon</RootNamespace>
-    <AssemblyName>QualIQon</AssemblyName>
-    <Name>QualIQon</Name>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <RootNamespace>QualIQon.Plots</RootNamespace>
+    <AssemblyName>QualIQon.Plots</AssemblyName>
+    <Name>QualIQon.Plots</Name>
     <OutputType>Library</OutputType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Optional: Declare that the Repository URL can be published to NuSpec -->
@@ -15,8 +15,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <Authors>Pauline Hans</Authors>
-    <Description>QualIQon - Visual quality control for computational proteomics</Description>
-    <Summary>QualIQon - Visual quality control for computational proteomics</Summary>
+    <Description>QualIQon.Plots - Visual quality control for computational proteomics</Description>
+    <Summary>QualIQon.Plots - Visual quality control for computational proteomics</Summary>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/paulineHans/QualIQon_Tool.git </PackageProjectUrl>
     <!--<PackageIconUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageIconUrl>-->
@@ -24,9 +24,11 @@
     <RepositoryUrl>https://github.com/paulineHans/QualIQon_Tool.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
-  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="QualIQon.IO.fs" />
+    <Compile Include="./QualIQon.Plots.fs" />
+  </ItemGroup>
+  <ItemGroup>
+  <ProjectReference Include="..\QualIQon_Moduls\QualIQon.IO.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharpAux" />
