@@ -649,40 +649,88 @@ module ScoreRefinement =
         paramsArray
 
 
+module TIC = 
+    let TIC (directoryName:string) = 
+        let directoryPath = System.IO.Directory.GetFiles ( directoryName, "*.mzml")
+        let getOnFileLevel = 
+            directoryPath
+            |> Array.map(fun x -> 
+                let processMzMLToTIC =
+                    use inReaderMS = new MzMLReader(x)
+                    use inReaderPeaks = new MzMLReader(x)
+                    let runID = Core.MzIO.Reader.getDefaultRunID inReaderMS 
+                    let allSpectra = inReaderMS.ReadMassSpectra runID
+                    allSpectra
+                    |> Seq.choose (fun ms ->
+                        match MzIO.Processing.MassSpectrum.getMsLevel ms with
+                        | 1 -> 
+                            Some(
+                                MzIO.Processing.MassSpectrum.getScanTime ms,
+                                PeakArray.mzIntensityArrayOf (inReaderPeaks.getSpecificPeak1DArraySequential ms.ID)
+                                |> snd
+                                |> Array.sum
+                            )
+                        | _ -> None
+                    )
+                    |> Seq.toArray
+                    |> Array.indexed
+                let transformData  = 
+                    processMzMLToTIC
+                    |> Array.map (fun (x, (y,z)) -> 
+                        ((x |> float),y,z))
+                transformData)
+        getOnFileLevel
+
+module XIC = 
+    let XIC (directoryName:string) =  
+        let directoryPath =System.IO.Directory.GetFiles ( directoryName, "*mzML")
+        let exeXICFiles = 
+            directoryPath
+            |> Array.map (fun x -> 
+                let processMzMLToXICData =
+                    use inReaderMS = new MzMLReader(x)
+                    use inReaderPeaks = new MzMLReader(x)
+                    let runID = Core.MzIO.Reader.getDefaultRunID inReaderMS 
+                    let allSpectra = inReaderMS.ReadMassSpectra runID
+                    allSpectra
+                    |> Seq.choose (fun ms ->
+                        match MzIO.Processing.MassSpectrum.getMsLevel ms with
+                        | 1 -> 
+                            Some(
+                                MzIO.Processing.MassSpectrum.getScanTime ms,
+                                PeakArray.mzIntensityArrayOf (inReaderPeaks.getSpecificPeak1DArraySequential ms.ID)
+                            )
+                        | _ -> None
+                    )
+                    |> Seq.toArray
+                processMzMLToXICData)
+        exeXICFiles
 
 
-//MS1Map, TIC, XIC
-module MassspecFiles = 
-       let filesToMassSpectrum (directoryPath: string) =
-            let allData  = System.IO.Directory.GetFiles (directoryPath, "*.mzML")
-            let exe = 
-                allData
-                |> Array.map (fun x -> 
-                    let inReaderMS = new MzMLReader(x)
-                    let inReaderPeaks = new MzMLReader(x)
-                    let inRunID  = Core.MzIO.Reader.getDefaultRunID inReaderMS 
-                    let allSpectra = inReaderMS.ReadMassSpectra inRunID
-                    
-                    let getMassSpecData (x : Collections.Generic.IEnumerable<MassSpectrum>) = 
-                        x
-                        |> Seq.choose (fun ms ->
-                            match MzIO.Processing.MassSpectrum.getMsLevel ms with
-                            | 1 -> 
-                                Some(
-                                    MzIO.Processing.MassSpectrum.getScanTime ms,
-                                    PeakArray.mzIntensityArrayOf
-                                        (inReaderPeaks.getSpecificPeak1DArraySequential ms.ID)
-                                )
-                            | _ -> None
-                        )
-                        |> Seq.toArray 
-                        |> Array.map (fun (rt,(xs, ys))-> 
-                            Array.zip xs ys
-                            |> Array.map (fun (x,y)-> rt, (x,y))
-                        )
+module MS1Map = 
+    let MS1Map (directoryName:string) =  
+        let directoryPath =System.IO.Directory.GetFiles ( directoryName, "*mzML")
+        let exeFiles = 
+            directoryPath
+            |> Array.map (fun x -> 
+                let processMzMLToMS1MapData =
+                    use inReaderMS = new MzMLReader(x)
+                    use inReaderPeaks = new MzMLReader(x)
+                    let runID = Core.MzIO.Reader.getDefaultRunID inReaderMS 
+                    let allSpectra = inReaderMS.ReadMassSpectra runID
+                    allSpectra
+                    |> Seq.choose (fun ms ->
+                        match MzIO.Processing.MassSpectrum.getMsLevel ms with
+                        | 1 -> 
+                            Some(
+                                MzIO.Processing.MassSpectrum.getScanTime ms,
+                                PeakArray.mzIntensityArrayOf (inReaderPeaks.getSpecificPeak1DArraySequential ms.ID)
+                            )
+                        | _ -> None
+                    )
+                    |> Seq.toArray
+                processMzMLToMS1MapData)
+        exeFiles
 
-                    let massSpecData = allSpectra |> getMassSpecData
-                    massSpecData
-                )
-            exe
+
 

@@ -399,8 +399,8 @@ module MisscleavagesPlot =
                         [Trace2D.initScatter(
                             Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
                     
-                let templateChlamy = Template.init (majorLayout, traceLayout)
-                templateChlamy
+                let template = Template.init (majorLayout, traceLayout)
+                template
             //miscleavagesHistogram
             let maxY,chartListRaw = exe 
             let chartList,titlList =List.unzip chartListRaw
@@ -426,119 +426,278 @@ module MisscleavagesPlot =
                 |> Chart.withMarginSize(300,250,130,180)
             stylingChart
 
-module MS1MapPlot = 
-    open MassspecFiles 
-        let inputData (dirName: string) = MassspecFiles.filesToMassSpectrum dirName
-        let calc (path:string) = 
-            let input  = inputData path
-            let create bandwidth (data: pieces[]) =            
-                let halfBw = bandwidth / 1.0       
-                data
-                |> Seq.groupBy (fun x -> floor (x.RetentionTime / bandwidth)) 
-                |> Seq.map (fun (k,values) ->                                 
+module TICPlot = 
+    open TIC 
+        let layout = 
+            let axsisLayout () =
+                LinearAxis.init (
+                    ShowLine = true,
+                    ZeroLine = false,
+                    TickLabelStep = 1,
+                    ShowTickLabels = true,
+                    Mirror = StyleParam.Mirror.All,
+                    TickFont = (Font.init (Size = 20))    
+                )
+            
+            let majorLayout =    
+                    Layout.init (
+                        Title.init(
+                                Text="<b>Total Ion Chromatogram of <i>Chlamydomonas reinhardtii<i> data<b>", 
+                                Font = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 30, Color = Color.fromString "Black")), 
+                                XAnchor = StyleParam.XAnchorPosition.Center,
+                                AutoMargin = false,
+                                Standoff = 2
+                            ),
+                        Font = Font.init (Family = StyleParam.FontFamily.Arial, Size = 20, Color = Color.fromString "Black")
+                        )
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.XAxis 1), (axsisLayout ()))
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.YAxis 1), (axsisLayout ()))
+
+            let traceLayout = 
+                    [Trace2D.initScatter(
+                        Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
+                
+            let template = Template.init (majorLayout, traceLayout)
+            template
+        let createTICChart (inputData: (float * float * float)[]) =
+            Chart.Line3D (xyz = inputData, LineWidth = 5., MarkerColor = Color.fromColorScaleValues [ 0; 1; 2 ])
+            |> Chart.withTemplate layout 
+            |> Chart.withSize (1400, 1200)
+            |> Chart.withYAxisStyle(TitleText = "Intensity", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")) )
+            |> Chart.withXAxisStyle(TitleText = "Retention Time", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
+            |> Chart.withZAxisStyle (TitleText = "Index") 
+
+
+module XICPlot =
+    open XIC
+    let createXIC  = 
+        let collectMinMaxMz (xicDataArray: (float * (float[] * float[]))[][]) =
+            let allMz = 
+                xicDataArray
+                |> Array.collect (fun fileData ->
+                    fileData
+                    |> Array.collect (fun (rt, (mz, _)) -> mz)
+                )
+            let minMz = Array.min allMz
+            let maxMz = Array.max allMz
+            minMz, maxMz
+
+        let calculateMzBinWidth (minMax: float * float) =
+            let min, max = minMax
+            abs(ceil max - floor min) / 50.
+
+        // Function to bin data by retention time
+        let binByRetentionTime (bandwidth: float) (data: pieces[]) =
+            let halfBw = bandwidth / 2.0
+            data
+            |> Seq.groupBy (fun x -> floor (x.RetentionTime / bandwidth))
+            |> Seq.map (fun (k, values) ->
+                let rtBin =
                     if k < 0. then
-                        ((k  * bandwidth) + halfBw, values)   
+                        (k * bandwidth) + halfBw
                     else
-                        ((k + 1.) * bandwidth) - halfBw, values)  
-                |> Map.ofSeq
+                        ((k + 1.) * bandwidth) - halfBw
+                rtBin, (values |> Seq.toArray)
+            )
+            |> Map.ofSeq
 
-            //bins for inner m/Z values
-            let findMzBins (minMax: float * float) = 
-                let min,max = minMax
-                abs(ceil max - floor min) / 50.
+        // Function to bin data by m/z within each RT bin
 
-            //collect all m/z -> Min & Max for Binning 
-            let minMaxAllSpectra  =
-                let outerArray = 
-                    input
-                    |> Array.map (fun outer -> 
-                        let data = 
-                            outer
-                            |> Array.map (fun x -> 
-                                x
-                                |> Array.map (fun (x,y)->  
-                                    y
-                                    |> fst
-                                )
-                            )
-                        let min = 
-                            data 
-                            |> Array.map(fun x -> 
-                                x
-                                |> Array.min)
-                            |> Array.min
-                            
-                        let max = 
-                            data 
-                            |> Array.map(fun x -> 
-                                x
-                                |> Array.max)
-                            |> Array.max
-                        min, max )
-                outerArray
-            let concatMzBins = minMaxAllSpectra |> Array.map (findMzBins)
-
-            let createMzBins bandwidth (data: pieces[]) =            
-                let halfBw = bandwidth / 1.0       
-                data
-                |> Seq.groupBy (fun x -> floor (x.mz / bandwidth)) 
-                |> Seq.map (fun (k,values) ->                                 
+        let binByMz (bandwidth: float) (data: pieces[]) =
+            let halfBw = bandwidth / 2.0
+            data
+            |> Seq.groupBy (fun x -> floor (x.mz / bandwidth))
+            |> Seq.map (fun (k, values) ->
+                let mzBin =
                     if k < 0. then
-                        ((k  * bandwidth) + halfBw, values)   
+                        (k * bandwidth) + halfBw
                     else
-                        ((k + 1.) * bandwidth) - halfBw, values)  
-                |> Map.ofSeq
+                        ((k + 1.) * bandwidth) - halfBw
+                let intensitySum = values |> Seq.sumBy (fun x -> x.intensity)
+                mzBin, intensitySum
+            )
+            |> Map.ofSeq
+        // Function to create XIC data from raw data
 
-            let dataXIC  = 
-                let accsessParameters = 
-                    input 
-                    |> Array.map (fun z -> 
-                        z                        |> Array.collect (fun x -> 
-                            x
-                            |> Array.map (fun (y ,(z,a))-> 
-                                {RetentionTime = y;
-                                mz = z;
-                                intensity = a})))
-                //anwendung der binning funktionen
-                let binRT = 
-                    accsessParameters
-                    |> Array.map (fun x ->
-                        x
-                        |> create 1
-                        |> Map.toArray)
-                let binMz = 
-                    binRT 
-                    |> Array.map(fun z -> 
-                            z
-                            |> Array.map (fun (x,y) -> 
-                                let muhaha = 
-                                    y
-                                    |> Seq.toArray
-                                    |> createMzBins concatMzBins  
-                                    |> Map.toArray
-                                    |> Array.map (fun (x,y)-> 
-                                        //Berechnung der SUmme der Intensitäten pro m/Z bin 
-                                        let calcSumIntensity = 
-                                            y
-                                            |> Seq.toArray
-                                            |> Array.map (fun x -> x.intensity)
-                                            |> Array.sum
-                                        x, calcSumIntensity)
-                                x, muhaha
+        let createXICData (xicDataArray: (float * (float[] * float[]))[][])   =
+            let minMaxMz = collectMinMaxMz xicDataArray
+            let mzBinWidth = calculateMzBinWidth minMaxMz
+            let allPieces =
+                xicDataArray
+                |> Array.collect (fun fileData ->
+                    fileData
+                    |> Array.collect (fun (rt, (mzArray, intArray)) ->
+                        Array.zip mzArray intArray
+                        |> Array.map (fun (mz, intensity) ->
+                            { RetentionTime = rt; mz = mz; intensity = intensity }
                         )
                     )
-                binMz
+                )
+            let rtBins = binByRetentionTime 1.0 allPieces |> Map.toArray
+            rtBins
+            |> Array.collect (fun (rt, pieces ) ->
+                let mzBins = binByMz mzBinWidth pieces |> Map.toArray
+                mzBins |> Array.map (fun (mz, intensity) -> rt, mz, intensity)
+            )
+        let layout = 
+            let axsisLayout () =
+                LinearAxis.init (
+                    ShowLine = true,
+                    ZeroLine = false,
+                    TickLabelStep = 1,
+                    ShowTickLabels = true,
+                    Mirror = StyleParam.Mirror.All,
+                    TickFont = (Font.init (Size = 20))    
+                )
+            
+            let majorLayout =    
+                    Layout.init (
+                        Title.init(
+                                Text="<b>Overview of the realtive distribution of Misscleavages in <i>Chlamydomonas reinhardtii<i><b>", 
+                                Font = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 30, Color = Color.fromString "Black")), 
+                                XAnchor = StyleParam.XAnchorPosition.Center,
+                                AutoMargin = false,
+                                Standoff = 2
+                            ),
+                        Font = Font.init (Family = StyleParam.FontFamily.Arial, Size = 20, Color = Color.fromString "Black")
+                        )
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.XAxis 1), (axsisLayout ()))
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.YAxis 1), (axsisLayout ()))
 
-            let Heatmap = 
-                let extractIntensity = 
-                    dataXIC
-                    |> Array.map (fun x -> 
-                        x
-                        |> fun (x,y)-> 
-                            y
-                            |> Array.map (fun x -> snd x))  
-                let chart = 
-                    Chart.Heatmap (zData = extractIntensity)
-                chart 
-        
+            let traceLayout = 
+                    [Trace2D.initScatter(
+                        Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
+                
+            let template = Template.init (majorLayout, traceLayout)
+            template
+        // Function to create a 3D line chart from XIC data
 
+        let createXICChart (a: (float * (float array * float array)) array array)  =
+            let exe = createXICData a
+            Chart.Line3D (xyz = exe, LineWidth = 5., MarkerColor = Color.fromColorScaleValues [0; 1; 2])
+            |> Chart.withTemplate layout
+            |> Chart.withSize (1400, 1200)
+            |> Chart.withYAxisStyle(TitleText = "Intensity", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
+            |> Chart.withXAxisStyle(TitleText = "Retention Time", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
+            |> Chart.withZAxisStyle (TitleText = "m/z")
+        createXICChart
+
+module MS1MapPlot = 
+    open MS1Map
+
+    let createMS1Map = 
+        let collectMinMaxMz (xicDataArray: (float * (float[] * float[]))[][]) =
+            let allMz = 
+                xicDataArray
+                |> Array.collect (fun fileData ->
+                    fileData
+                    |> Array.collect (fun (rt, (mz, _)) -> mz)
+                )
+            let minMz = Array.min allMz
+            let maxMz = Array.max allMz
+            minMz, maxMz
+
+        let calculateMzBinWidth (minMax: float * float) =
+            let min, max = minMax
+            abs(ceil max - floor min) / 50.
+
+        // Function to bin data by retention time
+        let binByRetentionTime (bandwidth: float) (data: pieces[]) =
+            let halfBw = bandwidth / 2.0
+            data
+            |> Seq.groupBy (fun x -> floor (x.RetentionTime / bandwidth))
+            |> Seq.map (fun (k, values) ->
+                let rtBin =
+                    if k < 0. then
+                        (k * bandwidth) + halfBw
+                    else
+                        ((k + 1.) * bandwidth) - halfBw
+                rtBin, (values |> Seq.toArray)
+            )
+            |> Map.ofSeq
+
+        // Function to bin data by m/z within each RT bin
+
+        let binByMz (bandwidth: float) (data: pieces[]) =
+            let halfBw = bandwidth / 2.0
+            data
+            |> Seq.groupBy (fun x -> floor (x.mz / bandwidth))
+            |> Seq.map (fun (k, values) ->
+                let mzBin =
+                    if k < 0. then
+                        (k * bandwidth) + halfBw
+                    else
+                        ((k + 1.) * bandwidth) - halfBw
+                let intensitySum = values |> Seq.sumBy (fun x -> x.intensity)
+                mzBin, intensitySum
+            )
+            |> Map.ofSeq
+        // Function to create XIC data from raw data
+
+        let createXICData (xicDataArray: (float * (float[] * float[]))[][]) =
+            let minMaxMz = collectMinMaxMz xicDataArray
+            let mzBinWidth = calculateMzBinWidth minMaxMz
+            let allPieces =
+                xicDataArray
+                |> Array.collect (fun fileData ->
+                    fileData
+                    |> Array.collect (fun (rt, (mzArray, intArray)) ->
+                        Array.zip mzArray intArray
+                        |> Array.map (fun (mz, intensity) ->
+                            { RetentionTime = rt; mz = mz; intensity = intensity }
+                        )
+                    )
+                )
+            let rtBins = binByRetentionTime 1.0 allPieces |> Map.toArray
+            rtBins
+            |> Array.collect (fun (rt, pieces ) ->
+                let mzBins = binByMz mzBinWidth pieces |> Map.toArray
+                mzBins |> Array.map (fun (mz, intensity) -> rt, (mz, intensity))
+            )
+            
+        let layout = 
+            let axsisLayout () =
+                LinearAxis.init (
+                    ShowLine = true,
+                    ZeroLine = false,
+                    TickLabelStep = 1,
+                    ShowTickLabels = true,
+                    Mirror = StyleParam.Mirror.All,
+                    TickFont = (Font.init (Size = 20))    
+                )
+            
+            let majorLayout =    
+                    Layout.init (
+                        Title.init(
+                                Text="<b>Overview of the realtive distribution of Misscleavages in <i>Chlamydomonas reinhardtii<i><b>", 
+                                Font = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 30, Color = Color.fromString "Black")), 
+                                XAnchor = StyleParam.XAnchorPosition.Center,
+                                AutoMargin = false,
+                                Standoff = 2
+                            ),
+                        Font = Font.init (Family = StyleParam.FontFamily.Arial, Size = 20, Color = Color.fromString "Black")
+                        )
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.XAxis 1), (axsisLayout ()))
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.YAxis 1), (axsisLayout ()))
+
+            let traceLayout = 
+                    [Trace2D.initScatter(
+                        Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
+                
+            let template = Template.init (majorLayout, traceLayout)
+            template
+        // Function to create a 3D line chart from XIC data
+
+        let createXICChart (inputData: (float * (float[] * float[]))[][])  =
+            let exe = createXICData inputData
+            let extractIntensity = 
+                exe 
+                |> Array.map (fun (x,y) -> y |> snd)
+            let buildHeatmap = 
+                Chart.Heatmap (zData = [|extractIntensity|])
+                |> Chart.withTemplate layout
+                |> Chart.withSize (1400, 1200)
+                |> Chart.withYAxisStyle(TitleText = "Retention Time", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
+                |> Chart.withXAxisStyle(TitleText = "m/z", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
+            buildHeatmap
+        createXICChart
