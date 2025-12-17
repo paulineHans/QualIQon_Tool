@@ -1,9 +1,14 @@
 namespace QualIQon.Tool.CorrHeavy
 
-open System 
+open System
 open System.IO
-open QualIQon.IO 
-open QualIQon.Plots 
+open Deedle
+open FSharp.Stats
+open Plotly.NET
+open FSharpAux
+open Plotly.NET.TraceObjects
+open Plotly.NET.LayoutObjects
+open ProteomIQon
 
 module createCorrHeavyPlot =
     let HeatmapCorrelationHeavy = QualIQon.Plots.CorrHeavyPlot.quantHeavy

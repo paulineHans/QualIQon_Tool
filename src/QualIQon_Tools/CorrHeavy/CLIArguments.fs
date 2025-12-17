@@ -1,4 +1,4 @@
-namespace QualIQon
+namespace QualIQon.Tool.CorrHeavy
 
 open System
 open System.IO
@@ -9,6 +9,7 @@ open FSharpAux
 open Plotly.NET.TraceObjects
 open Plotly.NET.LayoutObjects
 open Argu
+
 
 module CLI_Parsing =
   

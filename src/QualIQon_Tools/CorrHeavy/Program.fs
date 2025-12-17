@@ -1,16 +1,11 @@
-namespace QualIQon 
+namespace QualIQon.Tool.CorrHeavy
 
-open System
-open System.IO
-open Deedle
-open FSharp.Stats
-open Plotly.NET
-open FSharpAux
-open Plotly.NET.TraceObjects
-open Plotly.NET.LayoutObjects
 open Argu 
 open CLI_Parsing
 open System.Reflection
+open QualIQon.IO
+open QualIQon.Plots
+open createCorrHeavyPlot
 
 module console_Corr_Heavy = 
     [<EntryPoint>]
@@ -22,12 +17,12 @@ module console_Corr_Heavy =
         let o = results.GetResult Pipeline
         let p = results.GetResult LabeledData        
         let execute_Corr_Heavy = 
-            let createDirectory = System.IO.Directory.CreateDirectory ((String.concat "" [|"./arc/runs"; i; "/Results/Corr_Heavy"|]))
             let labeling = p
             let checkExecution = 
-                if labeling = "15N" then do
-                    Corr_Heavy.finalHeatmapQuantHeavy i o
-                else  Corr_Heavy.finalHeatmapQuantHeavy i o |> ignore 
+                if labeling = "15N" then 
+                   Some (HeatmapCorrelationHeavy i o)
+                else  
+                    None
             checkExecution
-            0
         execute_Corr_Heavy
+        0

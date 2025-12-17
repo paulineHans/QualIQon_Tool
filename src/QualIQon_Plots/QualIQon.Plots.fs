@@ -591,8 +591,8 @@ module ScoreRefinementPlot =
                     [Trace2D.initScatter(
                             Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
                 
-            let templateChlamy = Template.init (majorLayout, traceLayout)
-            templateChlamy
+            let template = Template.init (majorLayout, traceLayout)
+            template
         
         //styling combined charts 
         let styleFinalChart= 
@@ -602,7 +602,6 @@ module ScoreRefinementPlot =
             |> Chart.withMarginSize (200, 50, 150, 300)
             |> Chart.withYAxisStyle("<b>before and after refinement<b>", TitleStandoff = 50)
             |> Chart.withXAxisStyle ("<b>files, according to the respective MS-run<b>", TitleStandoff = 50)
-        
         styleFinalChart
 
 
