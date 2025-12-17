@@ -2,7 +2,6 @@
 
 open BlackFox.Fake
 open Fake.DotNet
-
 open ProjectInfo
 open BasicTasks
 

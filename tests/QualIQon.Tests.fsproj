@@ -10,7 +10,10 @@
     <Compile Include="Sample.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\../QualIQon_Moduls\QualIQon.IO.fsproj" />
+    <ProjectReference Include="..\../QualIQon_Plots\QualIQon.Plots.fsproj" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Expecto"  />
     <PackageReference Include="Microsoft.NET.Test.Sdk"  />

@@ -40,6 +40,5 @@
     <PackageVersion Include="Fake.IO.FileSystem" Version="6.0.0" />
     <PackageVersion Include="Fake.Tools.Git" Version="6.0.0" />
     <PackageVersion Include="Fake.Extensions.Release" Version="1.0.0" />
-    <PackageVersion Include="MSBuild.StructuredLogger" Version="2.2.441" />
   </ItemGroup>
 </Project>
