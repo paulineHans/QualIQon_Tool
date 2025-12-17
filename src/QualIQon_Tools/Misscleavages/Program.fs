@@ -1,16 +1,9 @@
-namespace QualIQon
+namespace QualIQon.Tools.Misscleavages
 
-open ProteomIQon
-open ProteomIQon.Dto
-open System 
-open System.IO 
-open Plotly.NET 
-open Plotly.NET.TraceObjects
-open Plotly.NET.LayoutObjects
-open Deedle
 open Argu
 open CLI_Parsing
 open System.Reflection
+open createMisscleavagePlot
 
 
 
@@ -24,7 +17,6 @@ module consule_MC =
             let i = results.GetResult DirectoryPath 
             let o = results.GetResult Pipeline       
             let execution = 
-                System.IO.Directory.CreateDirectory ((String.concat "" [| "./arc/runs" ;i;"/Results/Misscleavages" |]))
-                Misscleavages.misscleavages i o 
-                0
+                MCPlot i o 
             execution
+            0

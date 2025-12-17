@@ -1,4 +1,4 @@
-namespace QualIQon.Tool.CorrLH
+namespace QualIQon.Tool.CorrLHP
 
 
 open System
@@ -18,11 +18,13 @@ module consule_Correlation_Light_Heavy =
             let i = results.GetResult DirectoryPath 
             let o = results.GetResult Pipeline 
             let p = results.GetResult LabeledData        
-            let execution = 
+            let exe = 
                 let labeling  = p
+                let check = 
                     if labeling = "15N" then
-                        CorrelationLightHeavy i 
+                        Some (CorrelationLightHeavy i o)
                     else 
-                        ((printfn "No plot aviable because there is no 15N data used in the experiement"))
+                        None
+                check
                 0
-            execution
+            exe

@@ -1,16 +1,12 @@
-namespace QualIQon 
+namespace QualIQon.Tools.CorrLight
 
-open System
-open System.IO
-open Deedle
-open FSharp.Stats
-open Plotly.NET
-open FSharpAux
-open Plotly.NET.TraceObjects
-open Plotly.NET.LayoutObjects
+
 open Argu
 open CLI_Parsing
 open System.Reflection
+open QualIQon.IO
+open QualIQon.Plots
+open createCorrLightPlot
 
 
 module console_Corr_Light = 
@@ -21,15 +17,15 @@ module console_Corr_Light =
         let results = parser.Parse argv
         let i = results.GetResult DirectoryPath 
         let o = results.GetResult Pipeline 
-        let p = results.GetResult LabeldData      
+        let p = results.GetResult LabeledData      
 
         let execute_Corr_Light = 
-            let createDirectory = System.IO.Directory.CreateDirectory ((String.concat "" [|"./arc/runs"; i; "/Results/Corr_Light"|]))
             let labeling = p
             let checkExecution = 
-                if labeling = "14N" then do
-                    Corr_Light.finalHeatmapQuantLight i o
-                else  Corr_Light.finalHeatmapQuantLight i o |> ignore 
+                if labeling = "14N" then 
+                   Some ( HeatmapCorrelationLight i o)
+                else  
+                    None 
             checkExecution
             0
         execute_Corr_Light

@@ -1,17 +1,9 @@
-namespace QualIQon
-
-// open Plotly.NET.TraceObjects
-// open Plotly.NET.LayoutObjects
-// open ProteomIQon.Dto
-// open Plotly.NET
-// open System
-// open BioFSharp
-// open BioFSharp.IO
-// open BioFSharp.PeptideClassification
+namespace QualIQon.Tools.ProteinId
 
 open Argu
 open CLI_Parsing
 open System.Reflection
+open createProteinIdentificationPlot
 
 module consule_ProteinIdentification = 
         [<EntryPoint>]
@@ -19,12 +11,11 @@ module consule_ProteinIdentification =
                 let errorHandler = ProcessExiter(colorizer = function ErrorCode.HelpText -> None | _ -> Some System.ConsoleColor.Red)
                 let parser = ArgumentParser.Create<CLIArguments>(programName =  (System.Reflection.Assembly.GetExecutingAssembly().GetName().Name),errorHandler=errorHandler)     
                 let results = parser.Parse argv
-                let i = results.GetResult directoryPath 
-                let o = results.GetResult pipeline 
+                let i = results.GetResult DirectoryPath 
+                let o = results.GetResult Pipeline 
                 let f = results.GetResult FASTA       
                 let execution = 
-                    let dir = System.IO.Directory.CreateDirectory ((String.concat "" [| "./arc/runs" ;i;"/Results/ProteinIdentification" |]))
-                    let exe = ProteinIdentification.finalChartHisto i o f
+                    let exe = ProteinIdentification i o f
                     exe 
                 execution
                 0

@@ -1,4 +1,4 @@
-namespace QualIQon.Tool.CorrLH
+namespace QualIQon.Tool.CorrLHP
 
 open Argu
 

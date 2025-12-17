@@ -29,8 +29,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Corr_Ratio.fs" />
-    <Compile Include="Program.fs" />
     <Compile Include="CLIArguments.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\../QualIQon_Moduls\QualIQon.IO.fsproj" />
+    <ProjectReference Include="..\../QualIQon_Plots\QualIQon.Plots.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharpAux" />

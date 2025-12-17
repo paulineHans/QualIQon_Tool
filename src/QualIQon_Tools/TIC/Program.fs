@@ -1,11 +1,8 @@
-namespace QualIQon 
+namespace QualIQon.Tools.TIC 
 
-open System
-open ProteomIQon
-open Plotly.NET
-open MzIO.IO.MzML
-open MzIO.Processing
-open MzIO.Model
+open createTICPlot
+open Argu 
+open CLI_Parsing
 
 
 module console_TIC = 
@@ -14,11 +11,9 @@ module console_TIC =
                 let errorHandler = ProcessExiter(colorizer = function ErrorCode.HelpText -> None | _ -> Some System.ConsoleColor.Red)
                 let parser = ArgumentParser.Create<CLIArguments>(programName =  (System.Reflection.Assembly.GetExecutingAssembly().GetName().Name),errorHandler=errorHandler)     
                 let results = parser.Parse argv
-                let i = results.GetResult directoryPath 
-                let o = results.GetResult pipeline        
+                let i = results.GetResult DirectoryPath        
                 let execution = 
-                    let dir = System.IO.Directory.CreateDirectory ((String.concat "" [| "./arc/runs" ;i;"/Results/TIC" |]))
-                    let exe = TIC.filesToMassSpectrum i o 
+                    let exe = createTICPlot.TIC i 
                     exe
                 execution
                 0

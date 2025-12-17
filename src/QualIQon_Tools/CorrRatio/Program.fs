@@ -1,16 +1,10 @@
-namespace QualIQon 
+namespace QualIQon.Tools.CorrRatio
 
-open System
-open System.IO
-open Deedle
-open FSharp.Stats
-open Plotly.NET
-open FSharpAux
-open Plotly.NET.TraceObjects
-open Plotly.NET.LayoutObjects
+
 open Argu
 open CLI_Parsing
 open System.Reflection
+open createCorrRatioPlot
 
 module console_Corr_Ratio = 
     [<EntryPoint>]
@@ -22,12 +16,12 @@ module console_Corr_Ratio =
             let o = results.GetResult Pipeline
             let p = results.GetResult LabeledData        
             let execute_Corr_Ratio = 
-                let createDirectory = System.IO.Directory.CreateDirectory ((String.concat "" [|"./arc/runs"; i; "/Results/Corr_Ratio"|]))
                 let labeling = p
                 let checkExecution = 
-                    if labeling = "15N" then do
-                        Corr_Ratio.finalHeatmaRatio i o p
-                    else  Corr_Ratio.finalHeatmaRatio i o p |> ignore 
+                    if labeling = "15N" then 
+                        Some (HeatmapCorrelationRatio  i o )
+                    else  
+                        None
                 checkExecution
                 0
             execute_Corr_Ratio

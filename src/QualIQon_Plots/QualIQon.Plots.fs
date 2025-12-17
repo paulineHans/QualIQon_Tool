@@ -12,7 +12,6 @@ open QualIQon.IO
 
 
 module CorrHeavyPlot = 
-    open CorrHeavy
         let quantHeavy (dirName: string) (pipeline: string) = 
             let inputData = CorrHeavy.finalHeatmapQuantHeavy dirName pipeline
             let file = inputData |> Array.map (fun x -> (fst x).Split("TM").[1])

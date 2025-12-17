@@ -1,6 +1,6 @@
-namespace QualIQon
+namespace QualIQon.Tools.Misscleavages
 
-open System.IO 
+
 open Argu
 
 module CLI_Parsing =
