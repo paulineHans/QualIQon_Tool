@@ -428,7 +428,7 @@ module Misscleavages =
 
 
 
-module ProteinIdentification = 
+module FilesProteinIdentification = 
     let readFasta (path: string) =
         let readIn = 
             path
@@ -600,6 +600,46 @@ module ProteinIdentification =
 
 
 module ScoreRefinement =
+    let Iterations (a : string * (parameters_PSMS array)) = 
+            let file = a |> fst 
+            let data = a |> snd 
+            let logger = ProteomIQon.Logging.createLogger (System.IO.Path.GetFileNameWithoutExtension "")
+            //logger ist ein weg um zu verfolgen, was im Programm passiert. Output meistens log Datei 
+            let bestPSMPerScan = 
+                        data
+                        |> Array.filter (fun x -> nan.Equals(x.SND) = false && nan.Equals(x.AND) = false )
+                        |> Array.groupBy (fun x -> x.SNR)
+                        |> Array.map (fun (psmId,psms) -> 
+                            psms 
+                            |> Array.maxBy (fun x -> 
+                                x.SQ
+                                )
+                            )
+            //filtert die Daten um NaNs zu entfernen; grupiert die gefilterten Daten nach ScanNr und findet die besten PSM pro Scan basierend auf SEQUEST
+            let getQ = BioFSharp.Mz.FDRControl.calculateQValueStorey bestPSMPerScan (fun x -> x.SQ = -1) (fun x ->  x.SQ ) (fun x ->  x.SQ)             
+            //berechnet QValue 
+            let getPep =
+                let bw = 
+                    bestPSMPerScan
+                    |> Array.map (fun x -> x.SQ)
+                    |> FSharp.Stats.Distributions.Bandwidth.nrd0
+                    |> fun x -> x / 4.
+                ProteomIQon.PepValueCalculation.initCalculatePEPValueIRLS logger bw (fun (x: parameters_PSMS) -> x.L = -1) (fun x -> x.SQ ) (fun x -> x.SQ) bestPSMPerScan
+            // berechnet PEP Value 
+            let qpsm = 
+                bestPSMPerScan 
+                |> Array.filter (fun x -> 
+                    let qValPass = x.SQ|> getQ  < 0.05
+                    
+                    let pepValPass = x.SQ  |> getPep < 0.05
+                    printfn "%A" pepValPass
+                    qValPass && pepValPass
+
+                    )
+                |> Array.filter (fun x -> x.L = 1)
+                |> Array.map (fun x -> x.PSMID,x)
+                //|> Map.ofArray
+            qpsm, file
     let proteomIQonToParams (path:string) =
             let fileNames =  System.IO.Path.GetFileNameWithoutExtension path
             let files =  
@@ -618,13 +658,21 @@ module ScoreRefinement =
             (fileNames,files |> Seq.toArray)
 
         //read-in files 
-    let finalChart (directoryName: string) =
+    let readInPSMS (directoryName: string) =
         let allData  = System.IO.Directory.GetFiles (directoryName, "*.psm")
         let paramsArray = 
             allData 
             |> Array.map proteomIQonToParams
             |> Array.sort
-        paramsArray
+        let execution = paramsArray |> Array.map Iterations            
+        let length = 
+                execution 
+                |> Array.map (fun (x, file) -> 
+                    file, 
+                    x 
+                    |> Array.length)
+        length
+        
 
     let proteomIQonToParams_2 (path : string) = 
             let fileNames = System.IO.Path.GetFileNameWithoutExtension path
@@ -640,16 +688,21 @@ module ScoreRefinement =
             (fileNames,files |> Seq.toArray)
 
         //read-in files 
-    let readingFiles (directoryName: string) =
+    let IterationsPSM (b : (string * parameters_PSM array) array) = 
+            let kv = b |> Array.map (fun (x,y) -> x, (y |> Array.filter (fun z -> z.QV <0.05 && z.PEP <0.05) |> Array.length))
+            kv
+    let readInPSM (directoryName: string) =
         let allData2  = System.IO.Directory.GetFiles (directoryName, "*.qpsm")
         let paramsArray = 
             allData2
             |> Array.map proteomIQonToParams_2
             |> Array.sort 
-        paramsArray
+        let execution2 = paramsArray |> IterationsPSM
+        execution2
+        
 
 
-module TIC = 
+module TICFiles = 
     let TIC (directoryName:string) = 
         let directoryPath = System.IO.Directory.GetFiles ( directoryName, "*.mzml")
         let getOnFileLevel = 
@@ -681,7 +734,7 @@ module TIC =
                 transformData)
         getOnFileLevel
 
-module XIC = 
+module XICFiles = 
     let XIC (directoryName:string) =  
         let directoryPath =System.IO.Directory.GetFiles ( directoryName, "*mzML")
         let exeXICFiles = 
@@ -707,7 +760,7 @@ module XIC =
         exeXICFiles
 
 
-module MS1Map = 
+module MS1MapFiles = 
     let MS1Map (directoryName:string) =  
         let directoryPath =System.IO.Directory.GetFiles ( directoryName, "*mzML")
         let exeFiles = 

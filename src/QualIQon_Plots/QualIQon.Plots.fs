@@ -427,7 +427,8 @@ module MisscleavagesPlot =
             stylingChart
 
 module TICPlot = 
-    open TIC 
+    let create (dirName: string) = 
+        let call =  QualIQon.IO.TICFiles.TIC dirName
         let layout = 
             let axsisLayout () =
                 LinearAxis.init (
@@ -459,23 +460,160 @@ module TICPlot =
                 
             let template = Template.init (majorLayout, traceLayout)
             template
-        let createTICChart (inputData: (float * float * float)[]) =
-            Chart.Line3D (xyz = inputData, LineWidth = 5., MarkerColor = Color.fromColorScaleValues [ 0; 1; 2 ])
-            |> Chart.withTemplate layout 
-            |> Chart.withSize (1400, 1200)
-            |> Chart.withYAxisStyle(TitleText = "Intensity", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")) )
-            |> Chart.withXAxisStyle(TitleText = "Retention Time", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
-            |> Chart.withZAxisStyle (TitleText = "Index") 
+        let fileScope = 
+            call 
+            |> Array.map (fun x -> 
+                let createTICChart =
+                    Chart.Line3D (xyz =  x, LineWidth = 5., MarkerColor = Color.fromColorScaleValues [ 0; 1; 2 ])
+                    |> Chart.withTemplate layout 
+                    |> Chart.withSize (1400, 1200)
+                    |> Chart.withYAxisStyle(TitleText = "Intensity", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")) )
+                    |> Chart.withXAxisStyle(TitleText = "Retention Time", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
+                    |> Chart.withZAxisStyle (TitleText = "Index") 
+                createTICChart)
+        fileScope
+
+
+module ProteinIdentificationPlot = 
+        let PI (dirName: string) (pipeline: string)(FASTA: string) = 
+            let inputData = FilesProteinIdentification.finalChartHisto dirName pipeline FASTA
+            let dataPeptideEvidenceClass (allProteins: int)  = 
+                let amountProteinsInFASTA = allProteins.ToString() 
+                let nameForAbove = "unidentified Proteins (14140)"
+                let sub = 
+                    let subs = Array.fold (fun x y -> x - snd y) allProteins inputData
+                    let concat = [|nameForAbove, subs|]
+                    concat
+                let com = 
+                    sub 
+                    |> Array.append inputData 
+                com 
+            let createChart   =     
+                let legendvalues = 
+                    inputData 
+                    |> Array.map fst
+                let values = 
+                    inputData 
+                    |>  Array.map snd 
+                let Pie = Chart.Pie (
+                    values = values,
+                    Labels = legendvalues
+                )
+                Pie 
+            
+            let layout = 
+                let axsisLayout () =
+                    LinearAxis.init (
+                        ShowLine = true,
+                        Ticks = StyleParam.TickOptions.Inside,
+                        ZeroLine = false,
+                        TickLabelStep = 1,
+                        ShowTickLabels = true,
+                        Mirror = StyleParam.Mirror.All,
+                        TickFont = (Font.init (Size = 18))      
+                    )
+                let majorLayout =    
+                        Layout.init (
+                            Title.init(
+                                    Text="<b>Protein identification plot: identified proteins in relation to parts of the <i>Chlamydomonas reinhardtii<i> proteome<b>", 
+                                    Font = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 30, Color = Color.fromString "Black")), 
+                                    XAnchor = StyleParam.XAnchorPosition.Center,
+                                    AutoMargin = false
+                                ),
+                                Font = Font.init (Size = 25)
+                            )
+                        |> Layout.setLinearAxis ((StyleParam.SubPlotId.XAxis 1), (axsisLayout ()))
+                        |> Layout.setLinearAxis ((StyleParam.SubPlotId.YAxis 1), (axsisLayout ()))
+
+                let traceLayout = 
+                        [Trace2D.initScatter(
+                            Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
+                    
+                let template = Template.init (majorLayout, traceLayout)
+                template
+                    //styling options for chart
+            let stylingChart = 
+                createChart
+                        |> Chart.withSize(1900,1600)
+                        |> Chart.withMarginSize (250, 200, 130, 150)
+                        |> Chart.withTemplate layout
+            stylingChart
+
+
+module ScoreRefinementPlot = 
+    let SR (dirName: string) = 
+        let allPSM  = ScoreRefinement.readInPSM dirName
+        let allPSMS  = ScoreRefinement.readInPSMS dirName
+
+        let chartPSM = 
+            Chart.Column (keysValues = allPSM, MarkerColor = Color.fromHex ("#E31B4C"))
+            |> Chart.withTraceInfo("after")
+        
+        let chartPSMS = 
+            Chart.Column (keysValues = allPSMS, MarkerColor = Color.fromHex ("#E31B4C"))
+            |> Chart.withTraceInfo("after")
+            
+
+        let final_execution = 
+            //combine both Charts
+            let combineCharts = 
+                Chart.combine [
+                    chartPSM 
+                    chartPSMS 
+                ]
+            combineCharts
+            //layout 
+        let layout = 
+            let axsisLayout () =
+                LinearAxis.init (
+                Ticks = StyleParam.TickOptions.Inside,
+                ShowLine = true,
+                ZeroLine = false,
+                TickLabelStep = 1,
+                ShowTickLabels = true,
+                Mirror = StyleParam.Mirror.All,
+                AutoRange = StyleParam.AutoRange.True,
+                TickFont = (Font.init (Size = 20)) 
+            )
+            let majorLayout =    
+                    Layout.init (
+                        Title.init(
+                            Text = "<b>Score refinement plot: spectrum matches below confidence threshold after score refinement<b>", 
+                            Font = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 30, Color = Color.fromString "Black")),
+                            XAnchor = StyleParam.XAnchorPosition.Center,
+                            AutoMargin = false),
+                        Font = Font.init (Family = StyleParam.FontFamily.Arial, Size = 25, Color = Color.fromString "Black")
+                        )
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.XAxis 1), (axsisLayout ()))
+                    |> Layout.setLinearAxis ((StyleParam.SubPlotId.YAxis 1), (axsisLayout ()))
+
+            let traceLayout = 
+                    [Trace2D.initScatter(
+                            Trace2DStyle.Scatter(Marker = Marker.init (AutoColorScale = true)))]
+                
+            let templateChlamy = Template.init (majorLayout, traceLayout)
+            templateChlamy
+        
+        //styling combined charts 
+        let styleFinalChart= 
+            final_execution    
+            |> Chart.withTemplate layout    
+            |> Chart.withSize (1900,1600)
+            |> Chart.withMarginSize (200, 50, 150, 300)
+            |> Chart.withYAxisStyle("<b>before and after refinement<b>", TitleStandoff = 50)
+            |> Chart.withXAxisStyle ("<b>files, according to the respective MS-run<b>", TitleStandoff = 50)
+        
+        styleFinalChart
 
 
 module XICPlot =
-    open XIC
-    let createXIC  = 
-        let collectMinMaxMz (xicDataArray: (float * (float[] * float[]))[][]) =
+    let createXIC (dirName: string)  = 
+        let fileData = XICFiles.XIC dirName
+        let collectMinMaxMz  =
             let allMz = 
-                xicDataArray
-                |> Array.collect (fun fileData ->
-                    fileData
+                fileData
+                |> Array.collect (fun x ->
+                    x
                     |> Array.collect (fun (rt, (mz, _)) -> mz)
                 )
             let minMz = Array.min allMz
@@ -519,11 +657,10 @@ module XICPlot =
             |> Map.ofSeq
         // Function to create XIC data from raw data
 
-        let createXICData (xicDataArray: (float * (float[] * float[]))[][])   =
-            let minMaxMz = collectMinMaxMz xicDataArray
-            let mzBinWidth = calculateMzBinWidth minMaxMz
+        let createXICData =
+            let mzBinWidth = calculateMzBinWidth collectMinMaxMz
             let allPieces =
-                xicDataArray
+                fileData
                 |> Array.collect (fun fileData ->
                     fileData
                     |> Array.collect (fun (rt, (mzArray, intArray)) ->
@@ -572,9 +709,8 @@ module XICPlot =
             template
         // Function to create a 3D line chart from XIC data
 
-        let createXICChart (a: (float * (float array * float array)) array array)  =
-            let exe = createXICData a
-            Chart.Line3D (xyz = exe, LineWidth = 5., MarkerColor = Color.fromColorScaleValues [0; 1; 2])
+        let createXICChart   =
+            Chart.Line3D (xyz = createXICData, LineWidth = 5., MarkerColor = Color.fromColorScaleValues [0; 1; 2])
             |> Chart.withTemplate layout
             |> Chart.withSize (1400, 1200)
             |> Chart.withYAxisStyle(TitleText = "Intensity", Id = StyleParam.SubPlotId.Scene 1, TitleStandoff = 5, TitleFont = (Font.init (Family = StyleParam.FontFamily.Arial, Size= 22, Color = Color.fromString "Black")))
@@ -582,13 +718,12 @@ module XICPlot =
             |> Chart.withZAxisStyle (TitleText = "m/z")
         createXICChart
 
-module MS1MapPlot = 
-    open MS1Map
-
-    let createMS1Map = 
-        let collectMinMaxMz (xicDataArray: (float * (float[] * float[]))[][]) =
+module MS1MapPlot =
+    let createMS1Map (dirName:string)=
+        let call = QualIQon.IO.MS1MapFiles.MS1Map dirName
+        let collectMinMaxMz  =
             let allMz = 
-                xicDataArray
+                call
                 |> Array.collect (fun fileData ->
                     fileData
                     |> Array.collect (fun (rt, (mz, _)) -> mz)
@@ -634,11 +769,10 @@ module MS1MapPlot =
             |> Map.ofSeq
         // Function to create XIC data from raw data
 
-        let createXICData (xicDataArray: (float * (float[] * float[]))[][]) =
-            let minMaxMz = collectMinMaxMz xicDataArray
-            let mzBinWidth = calculateMzBinWidth minMaxMz
+        let createXICData  =
+            let mzBinWidth = calculateMzBinWidth collectMinMaxMz
             let allPieces =
-                xicDataArray
+                call
                 |> Array.collect (fun fileData ->
                     fileData
                     |> Array.collect (fun (rt, (mzArray, intArray)) ->
@@ -688,10 +822,9 @@ module MS1MapPlot =
             template
         // Function to create a 3D line chart from XIC data
 
-        let createXICChart (inputData: (float * (float[] * float[]))[][])  =
-            let exe = createXICData inputData
+        let createXICChart  =
             let extractIntensity = 
-                exe 
+                createXICData
                 |> Array.map (fun (x,y) -> y |> snd)
             let buildHeatmap = 
                 Chart.Heatmap (zData = [|extractIntensity|])

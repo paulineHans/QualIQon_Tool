@@ -111,7 +111,7 @@ module ScoreRefinement =
 
 
         //Q- and PepValue as Chart -> to be combined with chart before
-        let IterationsPsms (b : (string * parameters_PSM array) array) = 
+        let IterationsPSM (b : (string * parameters_PSM array) array) = 
             let kv = b |> Array.map (fun (x,y) -> x, (y |> Array.filter (fun z -> z.QV <0.05 && z.PEP <0.05) |> Array.length))
             //chart QValue/PEPvalue 
             let chart2 = 
@@ -142,7 +142,7 @@ module ScoreRefinement =
                 allData2
                 |> Array.map proteomIQonToParams_2
                 |> Array.sort 
-            let execution2 = paramsArray |> IterationsPsms
+            let execution2 = paramsArray |> IterationsPSM
             execution2
         
 
