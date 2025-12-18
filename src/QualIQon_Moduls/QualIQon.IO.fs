@@ -412,7 +412,7 @@ module Misscleavages =
     
     let getFiles (sndArg : string) = 
         match sndArg with
-        | "ProteomIQon" -> "*.quant"
+        | "ProteomIQon" -> "*.qpsm"
         | "FragPipe" -> "psm.tsv"
         | "MaxQuant" -> "evidence.txt"
         | _ -> failwith "no file found"

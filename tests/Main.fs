@@ -1,10 +1,11 @@
-﻿module QualIQon.Tests
+﻿
+module Main
 
 open Expecto
-open QualIQon.IO
-open QualIQon.Plots
+open TestsPlots
 
 [<EntryPoint>]
 let main argv =
-    runTestsWithArgs defaultConfig argv corrHeavyTests
+    runTestsWithCLIArgs [] argv tests
+
     

@@ -3,18 +3,18 @@
 open Fake.Core
 
 
-let project = "BioFSharp.XYZ"
+let project = "QualIQon"
 
 let testProjects = 
     [
-        "tests/BioFSharp.XYZ.Tests/BioFSharp.XYZ.Tests.fsproj"
+        "tests/QualIQon.Tests.fsproj"
     ]
 
 let solutionFile  = $"{project}.sln"
 
 let configuration = "Release"
 
-let gitOwner = "BioFSharp"
+let gitOwner = "Pauline Hans"
 
 let gitHome = $"https://github.com/{gitOwner}"
 

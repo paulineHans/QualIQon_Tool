@@ -13,17 +13,7 @@
     <!-- Optional: Include PDB in the built .nupkg -->
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
-  <PropertyGroup>
-    <Authors>Pauline Hans</Authors>
-    <Description>QualIQon.IO - Visual quality control for computational proteomics</Description>
-    <Summary>QualIQon.IO - Visual quality control for computational proteomics</Summary>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/paulineHans/QualIQon_Tool.git </PackageProjectUrl>
-    <!--<PackageIconUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageIconUrl>-->
-    <PackageTags>fsharp dotnet proteomics</PackageTags>
-    <RepositoryUrl>https://github.com/paulineHans/QualIQon_Tool.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="QualIQon.IO.fs" />
   </ItemGroup>

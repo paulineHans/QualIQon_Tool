@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,16 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Sample.fs" />
+    <Compile Include="TestsQualIQonIO.fs" />
+    <Compile Include="TestsQualIQonPlots.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\../QualIQon_Moduls\QualIQon.IO.fsproj" />
-    <ProjectReference Include="..\../QualIQon_Plots\QualIQon.Plots.fsproj" />
+    <ProjectReference Include="..\src/QualIQon_Moduls\QualIQon.IO.fsproj" />
+    <ProjectReference Include="..\src/QualIQon_Plots\QualIQon.Plots.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Expecto"  />
-    <PackageReference Include="Microsoft.NET.Test.Sdk"  />
-    <PackageReference Update="FSharp.Core"/>
+    <PackageReference Include="Expecto" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
   </ItemGroup>
 </Project>

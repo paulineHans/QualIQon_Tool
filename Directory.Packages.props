@@ -2,6 +2,17 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+  <PropertyGroup>
+    <Authors>Pauline Hans</Authors>
+    <Description>QualIQon.Correlation_Light_Heavy - Quality Control for computational proteomics</Description>
+    <Summary>QualIQon.Correlation_Light_Heavy - Quality Control for computational proteomics</Summary>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageProjectUrl>
+    <!--<PackageIconUrl>https://github.com/paulineHans/QualIQon_Tool.git</PackageIconUrl>-->
+    <PackageTags>fsharp dotnet proteomics</PackageTags>
+    <RepositoryUrl>https://github.com/paulineHans/QualIQon_Tool.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="FSharpAux" Version="2.0.0" />
     <PackageVersion Include="FSharpAux.IO" Version="2.0.0" />
