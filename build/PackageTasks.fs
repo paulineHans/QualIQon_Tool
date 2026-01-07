@@ -13,7 +13,6 @@ open Fake.IO.Globbing.Operators
 
 open System.Text.RegularExpressions
 
-/// https://github.com/Freymaurer/Fake.Extensions.Release#release-notes-in-nuget
 let private replaceCommitLink input = 
     let commitLinkPattern = @"\[\[#[a-z0-9]*\]\(.*\)\] "
     Regex.Replace(input,commitLinkPattern,"")

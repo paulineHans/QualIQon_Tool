@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>1.0.0</Version>
+    <Authors>Pauline Hans</Authors>
+    <Product>QualIQon Tool</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+        <ProjectReference Include="./src/QualIQon_Moduls/QualIQon.IO.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Plots/QualIQon.Plots.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/Correlation_Light_Heavy/Correlation_Light_Heavy.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/CorrHeavy/Corr_Heavy.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/CorrLight/Corr_Light.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/CorrRatio/Corr_Ratio.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/Misscleavages/Misscleavages.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/MS1Map/MS1Map.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/ProteinIdentification/ProteinIdentification.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/ScoreRefinement/ScoreRefinement.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/TIC/TIC.fsproj" />
+        <ProjectReference Include="./src/QualIQon_Tools/XIC/XIC.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+        <PackageReference Include="FSharpAux" />
+        <PackageReference Include="FSharpAux.IO" />
+        <PackageReference Include="FSharp.Stats.Interactive" />
+        <PackageReference Include="Plotly.NET" />
+        <PackageReference Include="Plotly.NET.Interactive" />
+        <PackageReference Include="Plotly.NET.ImageExport" />
+        <PackageReference Include="ProteomIQon" />
+        <PackageReference Include="Deedle" />
+        <PackageReference Include="Deedle.Interactive" />
+  </ItemGroup>
+</Project>
