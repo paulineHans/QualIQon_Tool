@@ -25,13 +25,13 @@ Plots you get from QualIQon
 ----------------------------
 
 1. Misscleavages (MCs) Plot 
-Shows the relative Distribution of MCs in all MS-runs. Currently set to max. two MCs 
+- Shows the relative Distribution of MCs in all MS-runs. Currently set to max. two MCs 
 
-2. XIC 
-Extracted Ion Chromatogram as 3D Plot which includes all MS-runs
+2. XIC
+- Extracted Ion Chromatogram as 3D Plot which includes all MS-runs
 
 3. TIC 
-Total Ion Chromatogram as 3D Plot which includes all MS-runs
+- Total Ion Chromatogram as 3D Plot which includes all MS-runs
 
 4. MS1Map 
 
