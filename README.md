@@ -5,7 +5,7 @@ QualIQon is a tool for visual quality control of standardized data analysis work
 
 This is achieved through the visualization of quality metrics derived from key steps in DDA-MS proteomics workflows, such as peptide spectrum matching, quantification, and protein identification. 
 
-The tool supports widely used analysis pipelines including ProteomIQon, MaxQuant, and FragPipe. 
+The tool supports widely used analysis pipelines including ProteomIQon (https://github.com/CSBiology/ProteomIQon), MaxQuant, and FragPipe. 
 
 The Core Project 
 ----------------- 
@@ -20,4 +20,30 @@ Contributing
 -----------------
 
 Please refer to the CSB [Contributing guidelines](.github/CONTRIBUTING.md)
+
+Plots you get from QualIQon
+----------------------------
+
+1. Misscleavages (MCs) Plot 
+Shows the relative Distribution of MCs in all MS-runs. Currently set to max. two MCs 
+
+2. XIC 
+Extracted Ion Chromatogram as 3D Plot which includes all MS-runs
+
+3. TIC 
+Total Ion Chromatogram as 3D Plot which includes all MS-runs
+
+4. MS1Map 
+
+5. Protein Identification 
+
+6. Score Refinement Plot (ProteomIQon specific)
+
+7. Visualization of the Correlation Light Heavy Parameter (ProteomIQon specific)
+
+8. Heatmap - Correlation of 14N data 
+
+9. Heatmap - Correlation of 15N data 
+
+10. Heatmap - Correlation of 14N/15N data 
 
