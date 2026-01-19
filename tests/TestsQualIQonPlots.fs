@@ -51,12 +51,7 @@ let tests =
             let chart = QualIQon.Plots.ProteinIdentificationPlot.PI dir "ProteomIQon"
             Expect.isNotNull (box chart) "Should return a chart object"
         
-        testCase "XIC throws on empty directory" <| fun _ ->
-            let dir = mkTempDir()
-            Expect.throws
-                (fun () -> QualIQon.Plots.XICPlot.createXIC dir |> ignore)
-                "Empty directory should throw"
-
+    
         
         testCase "TIC returns a chart (smoke test)" <| fun _ ->
             let dir = mkTempDir()

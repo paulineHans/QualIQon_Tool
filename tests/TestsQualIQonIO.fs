@@ -47,19 +47,7 @@ let tests =
 
             Expect.equal result.Length 0 "No mzML files -> no TIC data"
 
-        testCase "XIC returns empty array for empty directory" <| fun _ ->
-            // temp directory ohne mzML files
-            let dir =
-                System.IO.Path.Combine(
-                    System.IO.Path.GetTempPath(),
-                    System.Guid.NewGuid().ToString("N")
-                )
-
-            System.IO.Directory.CreateDirectory(dir) |> ignore
-
-            let result = QualIQon.IO.XICFiles.XIC dir
-
-            Expect.equal result.Length 0 "No mzML files -> no XIC data"
+    
 
         testCase "MS1Map returns empty array for empty directory" <| fun _ ->
             // temp directory ohne mzML files

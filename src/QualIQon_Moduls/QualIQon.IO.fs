@@ -704,43 +704,11 @@ module ScoreRefinement =
 
 module TICFiles = 
     let TIC (directoryName:string) = 
-        let directoryPath = System.IO.Directory.GetFiles ( directoryName, "*.mzml")
-        let getOnFileLevel = 
-            directoryPath
-            |> Array.map(fun x -> 
-                let processMzMLToTIC =
-                    use inReaderMS = new MzMLReader(x)
-                    use inReaderPeaks = new MzMLReader(x)
-                    let runID = Core.MzIO.Reader.getDefaultRunID inReaderMS 
-                    let allSpectra = inReaderMS.ReadMassSpectra runID
-                    allSpectra
-                    |> Seq.choose (fun ms ->
-                        match MzIO.Processing.MassSpectrum.getMsLevel ms with
-                        | 1 -> 
-                            Some(
-                                MzIO.Processing.MassSpectrum.getScanTime ms,
-                                PeakArray.mzIntensityArrayOf (inReaderPeaks.getSpecificPeak1DArraySequential ms.ID)
-                                |> snd
-                                |> Array.sum
-                            )
-                        | _ -> None
-                    )
-                    |> Seq.toArray
-                    |> Array.indexed
-                let transformData  = 
-                    processMzMLToTIC
-                    |> Array.map (fun (x, (y,z)) -> 
-                        ((x |> float),y,z))
-                transformData)
-        getOnFileLevel
-
-module XICFiles = 
-    let XIC (directoryName:string) =  
         let directoryPath =System.IO.Directory.GetFiles ( directoryName, "*mzML")
-        let exeXICFiles = 
+        let getFiles = 
             directoryPath
-            |> Array.map (fun x -> 
-                let processMzMLToXICData =
+            |> Array.map (fun x->  
+                let processMzMLToXICData = 
                     use inReaderMS = new MzMLReader(x)
                     use inReaderPeaks = new MzMLReader(x)
                     let runID = Core.MzIO.Reader.getDefaultRunID inReaderMS 
@@ -755,10 +723,10 @@ module XICFiles =
                             )
                         | _ -> None
                     )
-                    |> Seq.toArray
-                processMzMLToXICData)
-        exeXICFiles
-
+                    |> Seq.toArray                
+                processMzMLToXICData
+            )
+        getFiles
 
 module MS1MapFiles = 
     let MS1Map (directoryName:string) =  
